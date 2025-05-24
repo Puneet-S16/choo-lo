@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthSaathi - Hospital Dashboard</title>
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/pTnTGXv4/De-Watermark-ai-1748085636012.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #0066cc;
+      --secondary-blue: #4a90e2;
+      --light-blue: #e6f3ff;
+      --very-light-blue: #f0f8ff;
+      --dark-blue: #003d7a;
+      --navy-blue: #1e3a8a;
+      --white: #ffffff;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --success-green: #10b981;
+      --warning-orange: #f59e0b;
+      --danger-red: #ef4444;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      background: var(--gray-50);
+      color: var(--gray-700);
+    }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1001;
+      padding: 1rem 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-md);
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-blue);
+    }
+
+    .brand-logo {
+      height: 50px;
+      width: 50px;
+      margin-right: 10px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .toggle-btn {
+      background: var(--primary-blue);
+      color: var(--white);
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      margin-left: -130px;
+      position: relative;
+    }
+
+    .toggle-btn:hover {
+      background: var(--dark-blue);
+    }
+
+    /* Quick Actions Dropdown */
+    .quick-actions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--gray-200);
+      padding: 1rem;
+      min-width: 320px;
+      z-index: 1002;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .quick-actions.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .quick-action-item {
+      padding: 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 0.5rem;
+      border: 1px solid transparent;
+    }
+
+    .quick-action-item:hover {
+      background: var(--very-light-blue);
+      border-color: var(--primary-blue);
+    }
+
+    .quick-action-title {
+      font-weight: 600;
+      color: var(--dark-blue);
+      margin-bottom: 0.25rem;
+    }
+
+    .quick-action-desc {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--gray-700);
+      font-weight: 500;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 80px;
+      left: -300px;
+      width: 300px;
+      height: calc(100vh - 80px);
+      background: var(--white);
+      border-right: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-lg);
+      transition: left 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .sidebar-content {
+      padding: 2rem 0;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      color: var(--gray-700);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+    }
+
+    .sidebar-item:hover {
+      background: var(--very-light-blue);
+      color: var(--primary-blue);
+      border-left-color: var(--primary-blue);
+    }
+
+    .sidebar-item.active {
+      background: var(--light-blue);
+      color: var(--primary-blue);
+      border-left-color: var(--primary-blue);
+    }
+
+    .sidebar-icon {
+      font-size: 1.2rem;
+      width: 20px;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-top: 80px;
+      padding: 2rem;
+      transition: margin-left 0.3s ease;
+      min-height: calc(100vh - 80px);
+      padding-bottom: 4rem;
+    }
+
+    .main-content.shifted {
+      margin-left: 300px;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--dark-blue);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: var(--gray-600);
+      font-size: 1.1rem;
+    }
+
+    /* Enhanced Bed Status Cards */
+    .bed-status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .bed-status-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bed-status-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .bed-status-card.critical {
+      border-left: 6px solid var(--danger-red);
+    }
+
+    .bed-status-card.warning {
+      border-left: 6px solid var(--warning-orange);
+    }
+
+    .bed-status-card.healthy {
+      border-left: 6px solid var(--success-green);
+    }
+
+    .bed-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .bed-type {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--dark-blue);
+    }
+
+    .bed-icon {
+      font-size: 2rem;
+    }
+
+    .bed-count-display {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .available-count {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--dark-blue);
+    }
+
+    .total-count {
+      font-size: 1.2rem;
+      color: var(--gray-600);
+    }
+
+    .bed-bar {
+      height: 12px;
+      background: var(--gray-200);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .bed-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .bed-fill.critical {
+      background: linear-gradient(90deg, var(--danger-red), #ff6b6b);
+    }
+
+    .bed-fill.warning {
+      background: linear-gradient(90deg, var(--warning-orange), #fbbf24);
+    }
+
+    .bed-fill.healthy {
+      background: linear-gradient(90deg, var(--success-green), #34d399);
+    }
+
+    .bed-controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .bed-btn {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      border-radius: 6px;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      color: var(--gray-700);
+    }
+
+    .bed-btn:hover {
+      background: var(--primary-blue);
+      color: var(--white);
+      border-color: var(--primary-blue);
+    }
+
+    .bed-status-text {
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .bed-status-text.critical {
+      color: var(--danger-red);
+    }
+
+    .bed-status-text.warning {
+      color: var(--warning-orange);
+    }
+
+    .bed-status-text.healthy {
+      color: var(--success-green);
+    }
+
+    /* Dashboard Cards */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .dashboard-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--dark-blue);
+    }
+
+    /* Patient Booking Management */
+    .booking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .booking-item:hover {
+      background: var(--very-light-blue);
+      border-color: var(--primary-blue);
+    }
+
+    .booking-info {
+      flex: 1;
+    }
+
+    .booking-name {
+      font-weight: 600;
+      color: var(--dark-blue);
+      margin-bottom: 0.25rem;
+    }
+
+    .booking-details {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+    }
+
+    .booking-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-accept {
+      background: var(--success-green);
+      color: var(--white);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-accept:hover {
+      background: #059669;
+    }
+
+    .btn-reject {
+      background: var(--danger-red);
+      color: var(--white);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-reject:hover {
+      background: #dc2626;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--dark-blue);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      text-decoration: none;
+      font-size: 1rem;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: var(--primary-blue);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--dark-blue);
+    }
+
+    .btn-success {
+      background: var(--success-green);
+      color: var(--white);
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-200);
+    }
+
+    /* Table Styles */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .data-table th {
+      background: var(--gray-50);
+      font-weight: 600;
+      color: var(--dark-blue);
+    }
+
+    .data-table tr:hover {
+      background: var(--very-light-blue);
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-confirmed {
+      background: #dcfce7;
+      color: var(--success-green);
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: var(--warning-orange);
+    }
+
+    /* Hidden sections */
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    /* Footer Styles */
+    footer {
+      background: var(--dark-blue);
+      color: var(--white);
+      padding: 3rem 2rem 2rem;
+      text-align: center;
+      margin-top: 4rem;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--light-blue);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--white);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .main-content.shifted {
+        margin-left: 0;
+      }
+      
+      .sidebar {
+        width: 280px;
+        left: -280px;
+      }
+      
+      .dashboard-grid,
+      .bed-status-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav-container {
+        padding: 0 1rem;
+      }
+
+      .footer-links {
+        gap: 1rem;
+        flex-direction: column;
+      }
+
+      .quick-actions {
+        min-width: 280px;
+        left: -100px;
+      }
+    }
+
+    .hospital-name {
+      margin-right: -120px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <div class="nav-left">
+        <div style="position: relative;">
+          <button class="toggle-btn" onclick="toggleQuickActions()">⚡</button>
+          <div class="quick-actions" id="quickActions">
+            <div class="quick-action-item" onclick="showRecentAppointments()">
+              <div class="quick-action-desc">View and manage today's appointments</div>
+            </div>
+            <div class="quick-action-item" onclick="showBedStatus()">
+              <div class="quick-action-desc">Monitor bed availability in real-time</div>
+            </div>
+            <div class="quick-action-item" onclick="showPendingBookings()">
+              <div class="quick-action-desc">Accept or reject patient bookings</div>
+            </div>
+            <div class="quick-action-item" onclick="showEmergencyAlert()">
+              <div class="quick-action-title">🚨 Emergency Status</div>
+              <div class="quick-action-desc">View emergency room capacity</div>
+            </div>
+          </div>
+        </div>
+        <div class="logo">
+          <img src="https://i.postimg.cc/pTnTGXv4/De-Watermark-ai-1748085636012.png" alt="HealthSaathi Logo" class="brand-logo" />
+          <span>HealthSaathi</span>
+        </div>
+      </div>
+      <div class="nav-right">
+        <div class="user-info">
+          <span class="hospital-name">Apollo Hospital</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-content">
+      <div class="sidebar-item active" onclick="showSection('dashboard')">
+        <span>Dashboard</span>
+      </div>
+      <div class="sidebar-item" onclick="showSection('bed-management')">
+        <span>Bed Management</span>
+      </div>
+      <div class="sidebar-item" onclick="showSection('appointments')">
+        <span>Appointments</span>
+      </div>
+      <div class="sidebar-item" onclick="showSection('bookings')">
+        <span>Patient Bookings</span>
+      </div>
+      <div class="sidebar-item" onclick="showSection('update-info')">
+        <span>Update Information</span>
+      </div>
+      <div class="sidebar-item" onclick="logout()">
+        <span>Logout</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content" id="mainContent">
+    <!-- Dashboard Section -->
+    <div id="dashboard" class="content-section active">
+      <div class="page-header">
+        <h1 class="page-title">Hospital Dashboard</h1>
+        <p class="page-subtitle">Monitor bed availability and manage hospital resources</p>
+      </div>
+
+      <div class="bed-status-grid">
+        <div class="bed-status-card healthy" id="generalBedCard">
+          <div class="bed-header">
+            <div class="bed-type">General Beds</div>
+          </div>
+          <div class="bed-count-display">
+            <span class="available-count" id="generalAvailable">45</span>
+            <span class="total-count">/ 70 beds</span>
+          </div>
+          <div class="bed-bar">
+            <div class="bed-fill healthy" style="width: 64%;" id="generalFill"></div>
+          </div>
+          <div class="bed-status-text healthy">Good Availability</div>
+          <div class="bed-controls">
+            <button class="bed-btn" onclick="adjustBeds('general', -1)">−</button>
+            <button class="bed-btn" onclick="adjustBeds('general', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="bed-status-card warning" id="icuBedCard">
+          <div class="bed-header">
+            <div class="bed-type">ICU Beds</div>
+          </div>
+          <div class="bed-count-display">
+            <span class="available-count" id="icuAvailable">8</span>
+            <span class="total-count">/ 20 beds</span>
+          </div>
+          <div class="bed-bar">
+            <div class="bed-fill warning" style="width: 40%;" id="icuFill"></div>
+          </div>
+          <div class="bed-status-text warning">Moderate Availability</div>
+          <div class="bed-controls">
+            <button class="bed-btn" onclick="adjustBeds('icu', -1)">−</button>
+            <button class="bed-btn" onclick="adjustBeds('icu', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="bed-status-card critical" id="oxygenBedCard">
+          <div class="bed-header">
+            <div class="bed-type">Oxygen Beds</div>
+          </div>
+          <div class="bed-count-display">
+            <span class="available-count" id="oxygenAvailable">5</span>
+            <span class="total-count">/ 35 beds</span>
+          </div>
+          <div class="bed-bar">
+            <div class="bed-fill critical" style="width: 14%;" id="oxygenFill"></div>
+          </div>
+          <div class="bed-status-text critical">Low Availability</div>
+          <div class="bed-controls">
+            <button class="bed-btn" onclick="adjustBeds('oxygen', -1)">−</button>
+            <button class="bed-btn" onclick="adjustBeds('oxygen', 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Appointments</h2>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Patient Name</th>
+                <th>Doctor</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>John Doe</td>
+                <td>Dr. Sarah Wilson</td>
+                <td>10:00 AM</td>
+                <td><span class="status-badge status-confirmed">Confirmed</span></td>
+              </tr>
+              <tr>
+                <td>Jane Smith</td>
+                <td>Dr. Michael Chen</td>
+                <td>11:30 AM</td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td>Robert Johnson</td>
+                <td>Dr. Emily Davis</td>
+                <td>2:00 PM</td>
+                <td><span class="status-badge status-confirmed">Confirmed</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h2 class="card-title">Emergency Status</h2>
+          </div>
+          <div style="text-align: center; padding: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🚨</div>
+            <div style="font-size: 1.5rem; font-weight: 600; color: var(--success-green); margin-bottom: 0.5rem;">Normal</div>
+            <div style="color: var(--gray-600);">Emergency capacity: 12/15 available</div>
+            <div style="color: var(--gray-600); margin-top: 0.5rem;">Ambulances ready: 3/5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient Bookings Section -->
+    <div id="bookings" class="content-section">
+      <div class="page-header">
+        <h1 class="page-title">Patient Bookings</h1>
+        <p class="page-subtitle">Accept or reject pending patient booking requests</p>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title">Pending Booking Requests</h2>
+          <span style="background: var(--warning-orange); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem;">3 Pending</span>
+        </div>
+        
+        <div id="pendingBookings">
+          <div class="booking-item">
+            <div class="booking-info">
+              <div class="booking-name">Maria Garcia</div>
+              <div class="booking-details">General Medicine • Dr. Johnson • Tomorrow 9:00 AM</div>
+            </div>
+            <div class="booking-actions">
+              <button class="btn-accept" onclick="acceptBooking(this)">Accept</button>
+              <button class="btn-reject" onclick="rejectBooking(this)">Reject</button>
+            </div>
+          </div>
+
+          <div class="booking-item">
+            <div class="booking-info">
+              <div class="booking-name">David Kim</div>
+              <div class="booking-details">Cardiology • Dr. Wilson • Tomorrow 2:30 PM</div>
+            </div>
+            <div class="booking-actions">
+              <button class="btn-accept" onclick="acceptBooking(this)">Accept</button>
+              <button class="btn-reject" onclick="rejectBooking(this)">Reject</button>
+            </div>
+          </div>
+
+          <div class="booking-item">
+            <div class="booking-info">
+              <div class="booking-name">Sarah Thompson</div>
+              <div class="booking-details">Orthopedics • Dr. Chen • Day after tomorrow 11:00 AM</div>
+            </div>
+            <div class="booking-actions">
+              <button class="btn-accept" onclick="acceptBooking(this)">Accept</button>
+              <button class="btn-reject" onclick="rejectBooking(this)">Reject</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bed Management Section -->
+    <div id="bed-management" class="content-section">
+      <div class="page-header">
+        <h1 class="page-title">Bed Management</h1>
+        <p class="page-subtitle">Update bed availability and capacity</p>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title">Bed Capacity Management</h2>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">General Beds</label>
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+            <button class="bed-btn" onclick="adjustBedCapacity('general', -1)">−</button>
+            <span style="font-weight: 600; min-width: 60px; text-align: center;" id="generalCapacity">70</span>
+            <button class="bed-btn" onclick="adjustBedCapacity('general', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ICU Beds</label>
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+            <button class="bed-btn" onclick="adjustBedCapacity('icu', -1)">−</button>
+            <span style="font-weight: 600; min-width: 60px; text-align: center;" id="icuCapacity">20</span>
+            <button class="bed-btn" onclick="adjustBedCapacity('icu', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Oxygen Beds</label>
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+            <button class="bed-btn" onclick="adjustBedCapacity('oxygen', -1)">−</button>
+            <span style="font-weight: 600; min-width: 60px; text-align: center;" id="oxygenCapacity">35</span>
+            <button class="bed-btn" onclick="adjustBedCapacity('oxygen', 1)">+</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveBedChanges()">Save Changes</button>
+      </div>
+    </div>
+
+    <!-- Appointments Section -->
+    <div id="appointments" class="content-section">
+      <div class="page-header">
+        <h1 class="page-title">Appointments</h1>
+        <p class="page-subtitle">Manage today's appointments and schedule</p>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title">Today's Appointments</h2>
+          <span style="background: var(--success-green); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem;">8 Scheduled</span>
+        </div>
+        
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Patient Name</th>
+              <th>Doctor</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>9:00 AM</td>
+              <td>John Doe</td>
+              <td>Dr. Sarah Wilson</td>
+              <td>Cardiology</td>
+              <td><span class="status-badge status-confirmed">Confirmed</span></td>
+              <td>
+                <button class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View</button>
+              </td>
+            </tr>
+            <tr>
+              <td>10:30 AM</td>
+              <td>Maria Garcia</td>
+              <td>Dr. Johnson</td>
+              <td>General Medicine</td>
+              <td><span class="status-badge status-confirmed">Confirmed</span></td>
+              <td>
+                <button class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View</button>
+              </td>
+            </tr>
+            <tr>
+              <td>11:30 AM</td>
+              <td>Jane Smith</td>
+              <td>Dr. Michael Chen</td>
+              <td>Orthopedics</td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td>
+                <button class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View</button>
+              </td>
+            </tr>
+            <tr>
+              <td>2:00 PM</td>
+              <td>Robert Johnson</td>
+              <td>Dr. Emily Davis</td>
+              <td>Neurology</td>
+              <td><span class="status-badge status-confirmed">Confirmed</span></td>
+              <td>
+                <button class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View</button>
+              </td>
+            </tr>
+            <tr>
+              <td>3:30 PM</td>
+              <td>David Kim</td>
+              <td>Dr. Wilson</td>
+              <td>Cardiology</td>
+              <td><span class="status-badge status-confirmed">Confirmed</span></td>
+              <td>
+                <button class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Update Information Section -->
+    <div id="update-info" class="content-section">
+      <div class="page-header">
+        <h1 class="page-title">Update Hospital Information</h1>
+        <p class="page-subtitle">Keep hospital details current and accurate</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h2 class="card-title">Hospital Details</h2>
+          </div>
+          
+          <form onsubmit="updateHospitalInfo(event)">
+            <div class="form-group">
+              <label class="form-label">Hospital Name</label>
+              <input type="text" class="form-input" value="Apollo Hospital" id="hospitalName">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Contact Number</label>
+              <input type="tel" class="form-input" value="+91 98765 43210" id="contactNumber">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-input" value="contact@apollohospital.com" id="emailAddress">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Address</label>
+              <textarea class="form-input" rows="3" id="hospitalAddress">123 Medical Center Drive, Healthcare District, City - 110001</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Update Information</button>
+          </form>
+        </div>
+
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h2 class="card-title">Emergency Services</h2>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Emergency Contact</label>
+            <input type="tel" class="form-input" value="102" id="emergencyContact">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Ambulance Services</label>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <button class="bed-btn" onclick="adjustAmbulances(-1)">−</button>
+              <span style="font-weight: 600; min-width: 60px; text-align: center;" id="ambulanceCount">5</span>
+              <button class="bed-btn" onclick="adjustAmbulances(1)">+</button>
+              <span style="color: var(--gray-600);">Total Ambulances</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">24/7 Services Available</label>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                <input type="checkbox" checked> Emergency Room
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                <input type="checkbox" checked> ICU
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                <input type="checkbox" checked> Pharmacy
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;">
+                <input type="checkbox"> Laboratory
+              </label>
+            </div>
+          </div>
+
+          <button class="btn btn-success" onclick="updateEmergencyServices()">Update Services</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="#about">About HealthSaathi</a>
+        <a href="#contact">Contact Support</a>
+        <a href="#privacy">Privacy Policy</a>
+        <a href="#terms">Terms of Service</a>
+      </div>
+      <p>&copy; 2024 HealthSaathi. All rights reserved. Empowering healthcare management.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Bed data storage
+    let bedData = {
+      general: { available: 45, total: 70 },
+      icu: { available: 8, total: 20 },
+      oxygen: { available: 5, total: 35 }
+    };
+
+    let ambulanceData = { total: 5, available: 3 };
+
+    // Toggle Quick Actions Dropdown
+    function toggleQuickActions() {
+      const quickActions = document.getElementById('quickActions');
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+      
+      // Close sidebar if open
+      if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        mainContent.classList.remove('shifted');
+      }
+      
+      quickActions.classList.toggle('show');
+    }
+
+    // Quick Action Functions
+    function showRecentAppointments() {
+      showSection('appointments');
+      document.getElementById('quickActions').classList.remove('show');
+    }
+
+    function showBedStatus() {
+      showSection('dashboard');
+      document.getElementById('quickActions').classList.remove('show');
+    }
+
+    function showPendingBookings() {
+      showSection('bookings');
+      document.getElementById('quickActions').classList.remove('show');
+    }
+
+    function showEmergencyAlert() {
+      showSection('dashboard');
+      document.getElementById('quickActions').classList.remove('show');
+      // Scroll to emergency status card
+      setTimeout(() => {
+        document.querySelector('.dashboard-grid').scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    }
+
+    // Section Management
+    function showSection(sectionId) {
+      // Hide all sections
+      const sections = document.querySelectorAll('.content-section');
+      sections.forEach(section => section.classList.remove('active'));
+      
+      // Show target section
+      document.getElementById(sectionId).classList.add('active');
+      
+      // Update sidebar active state
+      const sidebarItems = document.querySelectorAll('.sidebar-item');
+      sidebarItems.forEach(item => item.classList.remove('active'));
+      
+      // Find and activate corresponding sidebar item
+      const targetItem = Array.from(sidebarItems).find(item => 
+        item.textContent.toLowerCase().includes(sectionId.replace('-', ' '))
+      );
+      if (targetItem) {
+        targetItem.classList.add('active');
+      }
+    }
+
+    // Bed Management Functions
+    function adjustBeds(bedType, change) {
+      const data = bedData[bedType];
+      const newAvailable = Math.max(0, Math.min(data.total, data.available + change));
+      
+      if (newAvailable !== data.available) {
+        data.available = newAvailable;
+        updateBedDisplay(bedType);
+      }
+    }
+
+    function adjustBedCapacity(bedType, change) {
+      const data = bedData[bedType];
+      const newTotal = Math.max(1, data.total + change);
+      
+      if (newTotal !== data.total) {
+        data.total = newTotal;
+        // Ensure available doesn't exceed total
+        if (data.available > newTotal) {
+          data.available = newTotal;
+        }
+        updateBedDisplay(bedType);
+        document.getElementById(bedType + 'Capacity').textContent = newTotal;
+      }
+    }
+
+    function updateBedDisplay(bedType) {
+      const data = bedData[bedType];
+      const percentage = (data.available / data.total) * 100;
+      
+      // Update display elements
+      document.getElementById(bedType + 'Available').textContent = data.available;
+      document.querySelector(`#${bedType}BedCard .total-count`).textContent = `/ ${data.total} beds`;
+      document.getElementById(bedType + 'Fill').style.width = percentage + '%';
+      
+      // Update status and colors
+      const card = document.getElementById(bedType + 'BedCard');
+      const statusText = card.querySelector('.bed-status-text');
+      const fill = document.getElementById(bedType + 'Fill');
+      
+      // Remove existing classes
+      card.classList.remove('healthy', 'warning', 'critical');
+      statusText.classList.remove('healthy', 'warning', 'critical');
+      fill.classList.remove('healthy', 'warning', 'critical');
+      
+      // Add appropriate classes based on percentage
+      if (percentage >= 60) {
+        card.classList.add('healthy');
+        statusText.classList.add('healthy');
+        fill.classList.add('healthy');
+        statusText.textContent = 'Good Availability';
+      } else if (percentage >= 30) {
+        card.classList.add('warning');
+        statusText.classList.add('warning');
+        fill.classList.add('warning');
+        statusText.textContent = 'Moderate Availability';
+      } else {
+        card.classList.add('critical');
+        statusText.classList.add('critical');
+        fill.classList.add('critical');
+        statusText.textContent = 'Low Availability';
+      }
+    }
+
+    // Booking Management
+    function acceptBooking(button) {
+      const bookingItem = button.closest('.booking-item');
+      const patientName = bookingItem.querySelector('.booking-name').textContent;
+      
+      bookingItem.style.backgroundColor = '#dcfce7';
+      bookingItem.style.borderColor = '#10b981';
+      button.textContent = 'Accepted';
+      button.style.backgroundColor = '#059669';
+      button.disabled = true;
+      
+      // Hide reject button
+      const rejectBtn = bookingItem.querySelector('.btn-reject');
+      rejectBtn.style.display = 'none';
+      
+      // Show success message
+      showNotification(`Booking accepted for ${patientName}`, 'success');
+      
+      // Remove after animation
+      setTimeout(() => {
+        bookingItem.style.transition = 'all 0.5s ease';
+        bookingItem.style.opacity = '0';
+        bookingItem.style.transform = 'translateX(100%)';
+        setTimeout(() => bookingItem.remove(), 500);
+      }, 2000);
+    }
+
+    function rejectBooking(button) {
+      const bookingItem = button.closest('.booking-item');
+      const patientName = bookingItem.querySelector('.booking-name').textContent;
+      
+      bookingItem.style.backgroundColor = '#fee2e2';
+      bookingItem.style.borderColor = '#ef4444';
+      button.textContent = 'Rejected';
+      button.style.backgroundColor = '#dc2626';
+      button.disabled = true;
+      
+      // Hide accept button
+      const acceptBtn = bookingItem.querySelector('.btn-accept');
+      acceptBtn.style.display = 'none';
+      
+      // Show notification
+      showNotification(`Booking rejected for ${patientName}`, 'error');
+      
+      // Remove after animation
+      setTimeout(() => {
+        bookingItem.style.transition = 'all 0.5s ease';
+        bookingItem.style.opacity = '0';
+        bookingItem.style.transform = 'translateX(-100%)';
+        setTimeout(() => bookingItem.remove(), 500);
+      }, 2000);
+    }
+
+    // Form Handlers
+    function updateHospitalInfo(event) {
+      event.preventDefault();
+      showNotification('Hospital information updated successfully!', 'success');
+    }
+
+    function updateEmergencyServices() {
+      showNotification('Emergency services updated successfully!', 'success');
+    }
+
+    function saveBedChanges() {
+      showNotification('Bed capacity changes saved successfully!', 'success');
+    }
+
+    // Ambulance Management
+    function adjustAmbulances(change) {
+      const newTotal = Math.max(1, ambulanceData.total + change);
+      if (newTotal !== ambulanceData.total) {
+        ambulanceData.total = newTotal;
+        // Ensure available doesn't exceed total
+        if (ambulanceData.available > newTotal) {
+          ambulanceData.available = newTotal;
+        }
+        document.getElementById('ambulanceCount').textContent = ambulanceData.total;
+      }
+    }
+
+    // Notification System
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#0066cc'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        z-index: 10000;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+      `;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      // Animate in
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+      
+      // Remove after delay
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Logout Function
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        showNotification('Logging out...', 'info');
+        setTimeout(() => {
+          window.location.href = '#';
+        }, 1500);
+      }
+    }
+
+    // Close quick actions when clicking outside
+    document.addEventListener('click', function(event) {
+      const quickActions = document.getElementById('quickActions');
+      const toggleBtn = document.querySelector('.toggle-btn');
+      
+      if (!quickActions.contains(event.target) && !toggleBtn.contains(event.target)) {
+        quickActions.classList.remove('show');
+      }
+    });
+
+    // Initialize bed displays on page load
+    window.addEventListener('load', function() {
+      updateBedDisplay('general');
+      updateBedDisplay('icu');
+      updateBedDisplay('oxygen');
+    });
+
+    // Add click handlers for bed cards to show details
+    document.querySelectorAll('.bed-status-card').forEach(card => {
+      card.addEventListener('click', function(event) {
+        if (!event.target.classList.contains('bed-btn')) {
+          // Show more details or navigate to bed management
+          showSection('bed-management');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
