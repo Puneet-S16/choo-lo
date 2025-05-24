@@ -43,6 +43,7 @@
       background: var(--gray-50);
       color: var(--gray-700);
     }
+
     header {
       position: fixed;
       top: 0;
@@ -108,6 +109,7 @@
     .toggle-btn:hover {
       background: var(--dark-blue);
     }
+
     .quick-actions {
       position: absolute;
       top: 100%;
@@ -138,6 +140,7 @@
       transition: all 0.3s ease;
       margin-bottom: 0.5rem;
       border: 1px solid transparent;
+      font-weight : bold;
     }
 
     .quick-action-item:hover {
@@ -163,6 +166,7 @@
       color: var(--gray-700);
       font-weight: 500;
     }
+
     .sidebar {
       position: fixed;
       top: 80px;
@@ -213,6 +217,7 @@
       font-size: 1.2rem;
       width: 20px;
     }
+
     .main-content {
       margin-top: 80px;
       padding: 2rem;
@@ -240,6 +245,7 @@
       color: var(--gray-600);
       font-size: 1.1rem;
     }
+
     .bed-status-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -378,6 +384,7 @@
     .bed-status-text.healthy {
       color: var(--success-green);
     }
+
     .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -407,6 +414,7 @@
       font-weight: 600;
       color: var(--dark-blue);
     }
+
     .booking-item {
       display: flex;
       justify-content: space-between;
@@ -470,6 +478,7 @@
     .btn-reject:hover {
       background: #dc2626;
     }
+
     .form-group {
       margin-bottom: 1.5rem;
     }
@@ -658,18 +667,24 @@
         <div style="position: relative;">
           <button class="toggle-btn" onclick="toggleQuickActions()">⚡</button>
           <div class="quick-actions" id="quickActions">
-            <div class="quick-action-item" onclick="showRecentAppointments()">
-              <div class="quick-action-desc">View and manage today's appointments</div>
-            </div>
-            <div class="quick-action-item" onclick="showBedStatus()">
-              <div class="quick-action-desc">Monitor bed availability in real-time</div>
-            </div>
-            <div class="quick-action-item" onclick="showPendingBookings()">
-              <div class="quick-action-desc">Accept or reject patient bookings</div>
-            </div>
             <div class="quick-action-item" onclick="showEmergencyAlert()">
               <div class="quick-action-title">🚨 Emergency Status</div>
               <div class="quick-action-desc">View emergency room capacity</div>
+            </div>
+            <div class="quick-action-item" onclick="showRecentAppointments()">
+              <div class="quick-action-title">Appointments</div>
+              <div class="quick-action-desc">View and manage today's appointments</div>
+            </div>
+            <div class="quick-action-item" onclick="showBedStatus()">
+              <div class="quick-action-title">Bed Availability</div>
+              <div class="quick-action-desc">Monitor bed availability in real-time</div>
+            </div>
+            <div class="quick-action-item" onclick="showPendingBookings()">
+              <div class="quick-action-title">Patient Bookings</div>
+              <div class="quick-action-desc">Accept or reject patient bookings</div>
+            </div>
+            <div class="quick-action-item" onclick="logout()">
+              <div class="quick-action-title">Logout</div>
             </div>
           </div>
         </div>
@@ -1099,12 +1114,10 @@
       const quickActions = document.getElementById('quickActions');
       const sidebar = document.getElementById('sidebar');
       const mainContent = document.getElementById('mainContent');
-      
       if (sidebar.classList.contains('open')) {
         sidebar.classList.remove('open');
         mainContent.classList.remove('shifted');
       }
-      
       quickActions.classList.toggle('show');
     }
 
@@ -1131,16 +1144,12 @@
       }, 300);
     }
 
-
     function showSection(sectionId) {
       const sections = document.querySelectorAll('.content-section');
       sections.forEach(section => section.classList.remove('active'));
-      
       document.getElementById(sectionId).classList.add('active');
-      
       const sidebarItems = document.querySelectorAll('.sidebar-item');
       sidebarItems.forEach(item => item.classList.remove('active'));
-      
       const targetItem = Array.from(sidebarItems).find(item => 
         item.textContent.toLowerCase().includes(sectionId.replace('-', ' '))
       );
@@ -1152,7 +1161,6 @@
     function adjustBeds(bedType, change) {
       const data = bedData[bedType];
       const newAvailable = Math.max(0, Math.min(data.total, data.available + change));
-      
       if (newAvailable !== data.available) {
         data.available = newAvailable;
         updateBedDisplay(bedType);
@@ -1162,7 +1170,6 @@
     function adjustBedCapacity(bedType, change) {
       const data = bedData[bedType];
       const newTotal = Math.max(1, data.total + change);
-      
       if (newTotal !== data.total) {
         data.total = newTotal;
         if (data.available > newTotal) {
@@ -1176,19 +1183,15 @@
     function updateBedDisplay(bedType) {
       const data = bedData[bedType];
       const percentage = (data.available / data.total) * 100;
-      
       document.getElementById(bedType + 'Available').textContent = data.available;
       document.querySelector(`#${bedType}BedCard .total-count`).textContent = `/ ${data.total} beds`;
       document.getElementById(bedType + 'Fill').style.width = percentage + '%';
-      
       const card = document.getElementById(bedType + 'BedCard');
       const statusText = card.querySelector('.bed-status-text');
       const fill = document.getElementById(bedType + 'Fill');
-      
       card.classList.remove('healthy', 'warning', 'critical');
       statusText.classList.remove('healthy', 'warning', 'critical');
       fill.classList.remove('healthy', 'warning', 'critical');
-      
       if (percentage >= 60) {
         card.classList.add('healthy');
         statusText.classList.add('healthy');
@@ -1210,18 +1213,14 @@
     function acceptBooking(button) {
       const bookingItem = button.closest('.booking-item');
       const patientName = bookingItem.querySelector('.booking-name').textContent;
-      
       bookingItem.style.backgroundColor = '#dcfce7';
       bookingItem.style.borderColor = '#10b981';
       button.textContent = 'Accepted';
       button.style.backgroundColor = '#059669';
       button.disabled = true;
-      
       const rejectBtn = bookingItem.querySelector('.btn-reject');
       rejectBtn.style.display = 'none';
-      
       showNotification(`Booking accepted for ${patientName}`, 'success');
-      
       setTimeout(() => {
         bookingItem.style.transition = 'all 0.5s ease';
         bookingItem.style.opacity = '0';
@@ -1233,18 +1232,14 @@
     function rejectBooking(button) {
       const bookingItem = button.closest('.booking-item');
       const patientName = bookingItem.querySelector('.booking-name').textContent;
-      
       bookingItem.style.backgroundColor = '#fee2e2';
       bookingItem.style.borderColor = '#ef4444';
       button.textContent = 'Rejected';
       button.style.backgroundColor = '#dc2626';
       button.disabled = true;
-      
       const acceptBtn = bookingItem.querySelector('.btn-accept');
       acceptBtn.style.display = 'none';
-      
       showNotification(`Booking rejected for ${patientName}`, 'error');
-      
       setTimeout(() => {
         bookingItem.style.transition = 'all 0.5s ease';
         bookingItem.style.opacity = '0';
@@ -1294,11 +1289,9 @@
       `;
       notification.textContent = message;
       document.body.appendChild(notification);
-      
       setTimeout(() => {
         notification.style.transform = 'translateX(0)';
       }, 100);
-      
       setTimeout(() => {
         notification.style.transform = 'translateX(100%)';
         setTimeout(() => notification.remove(), 300);
@@ -1309,7 +1302,7 @@
       if (confirm('Are you sure you want to logout?')) {
         showNotification('Logging out...', 'info');
         setTimeout(() => {
-          window.location.href = '#';
+          window.location.href = 'index.html';
         }, 1500);
       }
     }
@@ -1317,7 +1310,6 @@
     document.addEventListener('click', function(event) {
       const quickActions = document.getElementById('quickActions');
       const toggleBtn = document.querySelector('.toggle-btn');
-      
       if (!quickActions.contains(event.target) && !toggleBtn.contains(event.target)) {
         quickActions.classList.remove('show');
       }
